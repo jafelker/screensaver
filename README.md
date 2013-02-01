@@ -1,4 +1,4 @@
-screensaver
+Screensaver
 ===========
 
 Saves your screen.
