@@ -8,7 +8,8 @@ import static org.lwjgl.opengl.GL11.*;
 
 public class Main {
 	static boolean running = true;
-	public static void main(String [] args){
+
+	public static void main(String[] args) {
 		try {
 			setDisplayMode(Display.getDesktopDisplayMode().getWidth(), Display.getDesktopDisplayMode().getHeight(), true);
 			Display.create();
@@ -16,26 +17,29 @@ public class Main {
 			e.printStackTrace();
 		}
 		initGL();
-		while(running){
+		while (running) {
 			update();
 			render();
-			if (Display.isCloseRequested()) running = false;
+			if (Display.isCloseRequested())
+				running = false;
 		}
 		Display.destroy();
 	}
-	
+
 	private static void update() {
 		glColor3f(.5f, .5f, .5f);
-		while(Keyboard.next()) {
+		while (Keyboard.next()) {
 			int key = Keyboard.getEventKey();
 			if (key == Keyboard.KEY_ESCAPE)
 				running = false;
 		}
 	}
+
 	private static void render() {
 		glRecti(0, 0, 1, 1);
 		Display.update();
 	}
+
 	private static void initGL() {
 		glShadeModel(GL_SMOOTH);
 		glDisable(GL_LIGHTING);
@@ -52,7 +56,7 @@ public class Main {
 		glOrtho(0, 1, 1, 0, 1, -1);
 		glMatrixMode(GL_MODELVIEW);
 	}
-	
+
 	public static void setDisplayMode(int width, int height, final boolean fullscreen) {
 
 		// return if requested DisplayMode is already set
@@ -65,9 +69,7 @@ public class Main {
 
 			if (fullscreen) {
 				int freq = 0;
-System.out.println(width + "x" + height);
 				for (DisplayMode current : Display.getAvailableDisplayModes()) {
-					System.out.println(current);
 					if ((current.getWidth() == width) && (current.getHeight() == height)) {
 						if ((targetDisplayMode == null) || (current.getFrequency() >= freq)) {
 							if ((targetDisplayMode == null) || (current.getBitsPerPixel() > targetDisplayMode.getBitsPerPixel())) {
@@ -97,14 +99,6 @@ System.out.println(width + "x" + height);
 
 			Display.setDisplayMode(targetDisplayMode);
 			Display.setFullscreen(fullscreen);
-
-			/*glMatrixMode(GL_PROJECTION);
-			glLoadIdentity();
-			glViewport(0, 0, width, height);
-			glOrtho(0, width, height, 0, 1, -1);
-			glMatrixMode(GL_MODELVIEW);*/
-
-
 
 		} catch (LWJGLException e) {
 			System.out.println("Unable to setup mode " + width + "x" + height + " fullscreen=" + fullscreen + e);
