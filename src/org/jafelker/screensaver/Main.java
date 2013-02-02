@@ -9,43 +9,50 @@ import static org.lwjgl.opengl.GL11.*;
 public class Main {
 	static boolean running = true;
 	static String bool = "true";
-	static int posX = 0, posY = 0, pixelX = 0, pixelY = 0;
-	static double color = .1;
+	static int posX = 0, posY = 0, rowWidth = 110, boxSize, rowCount = 1;
+	static double color = .1, bgColor = 0;
+
+	static int DISPLAY_WIDTH, DISPLAY_HEIGHT;
 
 	public static void main(String[] args) {
 		try {
-			setDisplayMode(Display.getDesktopDisplayMode().getWidth(), Display.getDesktopDisplayMode().getHeight(),false);
+			setDisplayMode(Display.getDesktopDisplayMode().getWidth(), Display.getDesktopDisplayMode().getHeight(), false);
 			System.setProperty("org.lwjgl.opengl.Window.undecorated", bool);
-			posX = -1366;
+			//posX = -1366;
+			posX = 0;
 			posY = 0;
 			Display.setLocation(posX, posY);
 			Display.create();
 		} catch (LWJGLException e) {
 			e.printStackTrace();
 		}
+		DISPLAY_WIDTH = Display.getDesktopDisplayMode().getWidth();
+		DISPLAY_HEIGHT = Display.getDesktopDisplayMode().getHeight();
+		boxSize = DISPLAY_HEIGHT / 10;
 		initGL();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		while (running) {
 			update();
-			Display.sync(15);
+			Display.sync(60);
 			render();
 			if (Display.isCloseRequested())
 				running = false;
 		}
 		Display.destroy();
 	}
-	
-	private static void checkKeys(){
+
+	private static void checkKeys() {
 		while (Keyboard.next()) {
 			int key = Keyboard.getEventKey();
-			if(key == Keyboard.KEY_SPACE){
-				if(bool == "true")
+			if (key == Keyboard.KEY_SPACE) {
+				if (bool == "true")
 					bool = "false";
-				else if(bool == "false")
+				else if (bool == "false")
 					bool = "true";
 				posX = Display.getX();
 				posY = Display.getY();
 				Display.destroy();
-				setDisplayMode(Display.getDesktopDisplayMode().getWidth(), Display.getDesktopDisplayMode().getHeight(),false);
+				setDisplayMode(Display.getDesktopDisplayMode().getWidth(), Display.getDesktopDisplayMode().getHeight(), false);
 				System.setProperty("org.lwjgl.opengl.Window.undecorated", bool);
 				Display.setLocation(posX, posY);
 				try {
@@ -66,25 +73,39 @@ public class Main {
 
 	private static void update() {
 		checkKeys();
-		//glColor3d(0,0,0);
 	}
 
 	private static void render() {
-		glColor3d(color,color,color);
-		glRecti(pixelX,pixelY,pixelX + 110,pixelY + 110);
-		
-		pixelX += 110;
-		if(pixelX > 1366){
-			pixelY += 110;
-			pixelX = 0;
+		glColor3d(bgColor, bgColor, bgColor);
+		glRecti(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
+		glColor3d(color, color, color);
+
+		for (int i = 1; i <= rowCount; i++) {
+			if (i != rowCount)
+				glRecti(0, (i - 1) * boxSize, DISPLAY_WIDTH, i * boxSize);
+			else
+				glRecti(0, (i - 1) * boxSize, rowWidth, i * boxSize);
 		}
-		if(pixelY > 768){
-			pixelX = pixelY = 0;
+
+		rowWidth += boxSize;
+		if (rowWidth > DISPLAY_WIDTH) {
+			rowWidth = 0;
+			rowCount++;
+		}
+
+		if ((rowCount - 1) * boxSize >= DISPLAY_HEIGHT) {
+			rowCount = 1;
 			color += .1;
+			bgColor += .1;
 		}
-		if(color >= .49999)
+
+		if (color >= .49999)
 			color = 0;
+
 		Display.update();
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	}
 
 	private static void initGL() {
@@ -100,7 +121,7 @@ public class Main {
 
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glOrtho(0,1366, 768, 0, 1, -1);
+		glOrtho(0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0, 1, -1);
 		glMatrixMode(GL_MODELVIEW);
 	}
 
