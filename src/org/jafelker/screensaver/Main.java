@@ -8,10 +8,17 @@ import static org.lwjgl.opengl.GL11.*;
 
 public class Main {
 	static boolean running = true;
+	static String bool = "true";
+	static int posX = 0, posY = 0, pixelX = 0, pixelY = 0;
+	static double color = .1;
 
 	public static void main(String[] args) {
 		try {
-			setDisplayMode(Display.getDesktopDisplayMode().getWidth(), Display.getDesktopDisplayMode().getHeight(), true);
+			setDisplayMode(Display.getDesktopDisplayMode().getWidth(), Display.getDesktopDisplayMode().getHeight(),false);
+			System.setProperty("org.lwjgl.opengl.Window.undecorated", bool);
+			posX = -1366;
+			posY = 0;
+			Display.setLocation(posX, posY);
 			Display.create();
 		} catch (LWJGLException e) {
 			e.printStackTrace();
@@ -19,24 +26,64 @@ public class Main {
 		initGL();
 		while (running) {
 			update();
+			Display.sync(15);
 			render();
 			if (Display.isCloseRequested())
 				running = false;
 		}
 		Display.destroy();
 	}
-
-	private static void update() {
-		glColor3f(.5f, .5f, .5f);
+	
+	private static void checkKeys(){
 		while (Keyboard.next()) {
 			int key = Keyboard.getEventKey();
+			if(key == Keyboard.KEY_SPACE){
+				if(bool == "true")
+					bool = "false";
+				else if(bool == "false")
+					bool = "true";
+				posX = Display.getX();
+				posY = Display.getY();
+				Display.destroy();
+				setDisplayMode(Display.getDesktopDisplayMode().getWidth(), Display.getDesktopDisplayMode().getHeight(),false);
+				System.setProperty("org.lwjgl.opengl.Window.undecorated", bool);
+				Display.setLocation(posX, posY);
+				try {
+					Display.create();
+				} catch (LWJGLException e) {
+					e.printStackTrace();
+				}
+				initGL();
+			}
 			if (key == Keyboard.KEY_ESCAPE)
 				running = false;
+			if (key == Keyboard.KEY_1)
+				Display.setLocation(-1366, 0);
+			if (key == Keyboard.KEY_2)
+				Display.setLocation(0, 0);
 		}
 	}
 
+	private static void update() {
+		checkKeys();
+		//glColor3d(0,0,0);
+	}
+
 	private static void render() {
-		glRecti(0, 0, 1, 1);
+		glColor3d(color,color,color);
+		glRecti(pixelX,pixelY,pixelX + 110,pixelY + 110);
+		
+		pixelX += 110;
+		if(pixelX > 1366){
+			pixelY += 110;
+			pixelX = 0;
+		}
+		if(pixelY > 768){
+			pixelX = pixelY = 0;
+			color += .1;
+		}
+		if(color >= .49999)
+			color = 0;
 		Display.update();
 	}
 
@@ -53,7 +100,7 @@ public class Main {
 
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glOrtho(0, 1, 1, 0, 1, -1);
+		glOrtho(0,1366, 768, 0, 1, -1);
 		glMatrixMode(GL_MODELVIEW);
 	}
 
