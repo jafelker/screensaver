@@ -18,8 +18,8 @@ public class Main {
 		try {
 			setDisplayMode(Display.getDesktopDisplayMode().getWidth(), Display.getDesktopDisplayMode().getHeight(), false);
 			System.setProperty("org.lwjgl.opengl.Window.undecorated", bool);
-			//posX = -1366;
 			posX = 0;
+			//posX = -1366;
 			posY = 0;
 			Display.setLocation(posX, posY);
 			Display.create();
@@ -101,6 +101,8 @@ public class Main {
 
 		if (color >= .49999)
 			color = 0;
+		if (bgColor >= .49999)
+			bgColor = 0;
 
 		Display.update();
 
